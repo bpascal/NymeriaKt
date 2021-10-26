@@ -21,6 +21,15 @@ android {
         enabled = true
     }
 
+    lintOptions {
+        checkReleaseBuilds false
+        //lint 遇到 error 时继续 构建
+        ignoreWarnings true
+        // 防止在发布的时候出现因MissingTranslation导致Build Failed!
+        disable 'MissingTranslation'
+        disable "ResourceType"
+    }
+
     buildTypes {
         release {
             minifyEnabled false
