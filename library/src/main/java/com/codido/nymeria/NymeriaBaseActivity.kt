@@ -41,6 +41,21 @@ abstract class NymeriaBaseActivity<T : ViewBinding> : AppCompatActivity() {
     val MESSAGE_KEY_TOAST_STR = "MESSAGE_KEY_TOAST_STR";
 
     /**
+     * 两次点击返回按钮时间在2秒之内，则退出APP
+     */
+    private val EXIT_TIME_INTERVAL = 2000
+
+    /**
+     * 记录上次点击返回的时间点
+     */
+    private var mBackPressed: Long = 0
+
+    /**
+     * 双击退出的提示语
+     */
+    abstract var doubleBackExitTips: String
+
+    /**
      * 通用处理handler
      */
     private val mHandler: Handler = object : Handler(Looper.getMainLooper()) {
@@ -176,4 +191,25 @@ abstract class NymeriaBaseActivity<T : ViewBinding> : AppCompatActivity() {
 //    open fun isMainThread(): Boolean {
 //        return Looper.getMainLooper().thread.id == Thread.currentThread().id
 //    }
+
+    override fun onBackPressed() {
+        if (isDoubleBackExit()) {
+            //如果这个页面需要双击返回按钮后退出，则进入这段逻辑
+            if (mBackPressed + EXIT_TIME_INTERVAL > System.currentTimeMillis()) {
+                super.onBackPressed()
+                return
+            } else {
+                showShotToast(doubleBackExitTips)
+            }
+            mBackPressed = System.currentTimeMillis()
+        } else {
+            super.onBackPressed()
+            return
+        }
+    }
+
+    /**
+     * 双击返回按钮是否退出的抽象方法，true表示双击返回按钮后会退出，false表示不会
+     */
+    abstract fun isDoubleBackExit(): Boolean;
 }
