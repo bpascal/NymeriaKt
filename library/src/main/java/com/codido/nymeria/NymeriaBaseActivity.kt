@@ -1,6 +1,7 @@
 package com.codido.nymeria
 
 import android.os.Bundle
+import android.os.Handler
 import android.view.*
 import android.view.View.inflate
 import android.view.inputmethod.InputMethodManager
@@ -8,17 +9,66 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.viewbinding.ViewBinding
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.ParameterizedType
+import android.os.Looper
+import android.os.Message
+import android.util.Log
+import android.widget.Toast
 
 
 /**
  * Activity抽象基类
  */
-abstract class NymeriaBaseActivity<T: ViewBinding> : AppCompatActivity() {
+abstract class NymeriaBaseActivity<T : ViewBinding> : AppCompatActivity() {
 
     /**
      * 页面绑定视图的对象
      */
-    abstract var _viewBinding : T
+    abstract var _viewBinding: T
+
+    /**
+     * 长时间toast显示信号常量
+     */
+    val MESSAGE_WHAT_SHOW_LONGTOAST = 101;
+
+    /**
+     * 短时间toast显示信号常量
+     */
+    val MESSAGE_WHAT_SHOW_SHORTTOAST = 102;
+
+    /**
+     * toast显示的字符串的常量
+     */
+    val MESSAGE_KEY_TOAST_STR = "MESSAGE_KEY_TOAST_STR";
+
+    /**
+     * 通用处理handler
+     */
+    private val mHandler: Handler = object : Handler(Looper.getMainLooper()) {
+        override fun handleMessage(msg: Message) {
+            super.handleMessage(msg)
+            when (msg.what) {
+                MESSAGE_WHAT_SHOW_LONGTOAST -> {
+                    val msgObj = msg.data
+                    var showStr = msgObj.getString(MESSAGE_KEY_TOAST_STR)
+                    Toast.makeText(this@NymeriaBaseActivity, showStr.toString(), Toast.LENGTH_LONG)
+                        .show();
+                }
+                MESSAGE_WHAT_SHOW_SHORTTOAST -> {
+                    val msgObj = msg.data
+                    var showStr = msgObj.getString(MESSAGE_KEY_TOAST_STR)
+                    Toast.makeText(
+                        this@NymeriaBaseActivity,
+                        showStr.toString(),
+                        Toast.LENGTH_SHORT
+                    ).show();
+                }
+                else -> {
+                    val mBundle = msg.data
+                    mBundle?.toString()?.let { Log.e("接收到的数据:", it) }
+                }
+            }
+        }
+    }
 
 
     /**
@@ -79,4 +129,51 @@ abstract class NymeriaBaseActivity<T: ViewBinding> : AppCompatActivity() {
         }
         return super.onTouchEvent(event)
     }
+
+    /**
+     * 打印长时间toast方法
+     */
+    open fun showLongToast(toastTxt: String) {
+        if (isMainThread()) {
+            //如果当前是在主线程，则直接打印
+            Toast.makeText(this, toastTxt, Toast.LENGTH_LONG).show();
+        } else {
+            //当前不在主线程，
+            val message: Message = Message();
+            message.what = MESSAGE_WHAT_SHOW_LONGTOAST;
+            message.data.putString(MESSAGE_KEY_TOAST_STR, toastTxt);
+            mHandler.sendMessage(message)
+        }
+    }
+
+    /**
+     * 打印长时间toast方法
+     */
+    fun showShotToast(toastTxt: String) {
+        if (isMainThread()) {
+            //如果当前是在主线程，则直接打印
+            Toast.makeText(this, toastTxt, Toast.LENGTH_SHORT).show();
+        } else {
+            //当前不在主线程，
+            val message: Message = Message();
+            message.what = MESSAGE_WHAT_SHOW_SHORTTOAST;
+            message.data.putString(MESSAGE_KEY_TOAST_STR, toastTxt);
+            mHandler.sendMessage(message)
+        }
+    }
+
+    /**
+     * 判断是不是主线程
+     */
+    fun isMainThread(): Boolean {
+        return Looper.getMainLooper() == Looper.myLooper()
+    }
+
+//    open fun isMainThread(): Boolean {
+//        return Looper.getMainLooper().thread === Thread.currentThread()
+//    }
+//
+//    open fun isMainThread(): Boolean {
+//        return Looper.getMainLooper().thread.id == Thread.currentThread().id
+//    }
 }
