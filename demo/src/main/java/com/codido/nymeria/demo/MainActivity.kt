@@ -51,13 +51,9 @@ class MainActivity : NymeriaBaseActivity<ActivityMainBinding>() {
             )
             .request { allGranted, grantedList, deniedList ->
                 if (allGranted) {
-                    Toast.makeText(this, "All permissions are granted", Toast.LENGTH_LONG).show()
+                    showLongToast("All permissions are granted")
                 } else {
-                    Toast.makeText(
-                        this,
-                        "These permissions are denied: $deniedList",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    showLongToast("These permissions are denied: $deniedList")
                 }
             }
     }
