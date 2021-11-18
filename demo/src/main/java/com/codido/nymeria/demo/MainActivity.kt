@@ -1,8 +1,11 @@
 package com.codido.nymeria.demo
 
+import android.Manifest
+import android.widget.Toast
 import com.codido.nymeria.NymeriaBaseActivity
 import com.codido.nymeria.demo.databinding.ActivityMainBinding
 import com.google.android.material.snackbar.Snackbar
+import com.permissionx.guolindev.PermissionX
 
 /**
  * 主入口
@@ -23,8 +26,9 @@ class MainActivity : NymeriaBaseActivity<ActivityMainBinding>() {
     override fun initEvents() {
         super.initEvents()
         _viewBinding.fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
+//            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                .setAction("Action", null).show()
+            requestPermissionX();
         }
     }
 
@@ -35,5 +39,32 @@ class MainActivity : NymeriaBaseActivity<ActivityMainBinding>() {
         super.initDatas()
     }
 
+    /**
+     * 申请权限方法
+     */
+    fun requestPermissionX() {
+        PermissionX.init(this)
+            .permissions(
+                Manifest.permission.READ_CONTACTS,
+                Manifest.permission.CAMERA,
+                Manifest.permission.CALL_PHONE
+            )
+            .request { allGranted, grantedList, deniedList ->
+                if (allGranted) {
+                    showLongToast("All permissions are granted")
+                } else {
+                    showLongToast("These permissions are denied: $deniedList")
+                }
+            }
+    }
+
     override lateinit var _viewBinding: ActivityMainBinding
+
+    override var isDoubleBackExit: Boolean
+        get() = true
+        set(value) {}
+
+    override var doubleBackExitTips: String
+        get() = "再次点击返回按钮退出"
+        set(value) {}
 }
