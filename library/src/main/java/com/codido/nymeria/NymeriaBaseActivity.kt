@@ -61,6 +61,11 @@ abstract class NymeriaBaseActivity<T : ViewBinding> : AppCompatActivity() {
     abstract var doubleBackExitTips: String
 
     /**
+     * 双击返回按钮是否退出的抽象定义，true表示双击返回按钮后会退出，false表示不会
+     */
+    abstract var isDoubleBackExit: Boolean;
+
+    /**
      * 通用处理handler
      */
     private val mHandler: Handler = object : Handler(Looper.getMainLooper()) {
@@ -198,7 +203,7 @@ abstract class NymeriaBaseActivity<T : ViewBinding> : AppCompatActivity() {
 //    }
 
     override fun onBackPressed() {
-        if (isDoubleBackExit()) {
+        if (isDoubleBackExit) {
             //如果这个页面需要双击返回按钮后退出，则进入这段逻辑
             if (mBackPressed + EXIT_TIME_INTERVAL > System.currentTimeMillis()) {
                 super.onBackPressed()
@@ -213,8 +218,5 @@ abstract class NymeriaBaseActivity<T : ViewBinding> : AppCompatActivity() {
         }
     }
 
-    /**
-     * 双击返回按钮是否退出的抽象方法，true表示双击返回按钮后会退出，false表示不会
-     */
-    abstract fun isDoubleBackExit(): Boolean;
+
 }

@@ -62,9 +62,9 @@ class MainActivity : NymeriaBaseActivity<ActivityMainBinding>() {
 
     override lateinit var _viewBinding: ActivityMainBinding
 
-    override fun isDoubleBackExit(): Boolean {
-        return true;
-    }
+    override var isDoubleBackExit: Boolean
+        get() = true
+        set(value) {}
 
     override var doubleBackExitTips: String
         get() = "再次点击返回按钮退出"
