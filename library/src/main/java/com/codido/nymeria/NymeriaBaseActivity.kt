@@ -21,6 +21,11 @@ import android.widget.Toast
 abstract class NymeriaBaseActivity<T : ViewBinding> : AppCompatActivity() {
 
     /**
+     * 打印日志tag的定义
+     */
+    val TAG = this::class.simpleName!!
+
+    /**
      * 页面绑定视图的对象
      */
     abstract var _viewBinding: T

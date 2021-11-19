@@ -1,6 +1,7 @@
 package com.codido.nymeria.demo
 
 import android.Manifest
+import android.util.Log
 import android.widget.Toast
 import com.codido.nymeria.NymeriaBaseActivity
 import com.codido.nymeria.demo.databinding.ActivityMainBinding
@@ -29,6 +30,7 @@ class MainActivity : NymeriaBaseActivity<ActivityMainBinding>() {
 //            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                .setAction("Action", null).show()
             requestPermissionX();
+            Log.i(TAG,"牛逼");
         }
     }
 
