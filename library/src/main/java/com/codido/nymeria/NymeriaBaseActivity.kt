@@ -146,6 +146,11 @@ abstract class NymeriaBaseActivity<T : ViewBinding> : AppCompatActivity() {
                 }
                 MESSAGE_WHAT_SHOW_PROGRESSBAR -> {
                     //TODO bpascal 实现 显示加载条
+                    val msgObj = msg.data
+                    var showStr = msgObj.getString(MESSAGE_KEY_PROGRESS_STR)
+                    var showTitle = msgObj.getString(MESSAGE_KEY_PROGRESS_TITLE)
+                    var cancelAble = msgObj.getBoolean(MESSAGE_KEY_PROGRESS_CANCELABLE)
+                    var cancelOutSide = msgObj.getBoolean(MESSAGE_KEY_PROGRESS_CANCELABLEOUTSIDE)
                 }
                 MESSAGE_WHAT_HIDE_PROGRESSBAR -> {
                     //TODO bpascal 实现 隐藏加载条
@@ -272,7 +277,12 @@ abstract class NymeriaBaseActivity<T : ViewBinding> : AppCompatActivity() {
      * 显示加载条
      */
     @Deprecated(message = "方法暂未实现")
-    fun showProgressBar(showMessageText: String) {
+    fun showProgressBar(
+        showMessageText: String,
+        showMessageTitle: String,
+        cancelAble: Boolean,
+        cancelOutSide: Boolean
+    ) {
         //TODO bpascal 方法实现
         if (isMainThread()) {
             progressBar.visibility = View.VISIBLE
@@ -281,6 +291,9 @@ abstract class NymeriaBaseActivity<T : ViewBinding> : AppCompatActivity() {
             val message = Message();
             message.what = MESSAGE_WHAT_SHOW_PROGRESSBAR;
             message.data.putString(MESSAGE_KEY_PROGRESS_STR, showMessageText)
+            message.data.putString(MESSAGE_KEY_PROGRESS_TITLE, showMessageTitle)
+            message.data.putBoolean(MESSAGE_KEY_PROGRESS_STR, cancelAble)
+            message.data.putBoolean(MESSAGE_KEY_PROGRESS_TITLE, cancelOutSide)
             mHandler.sendMessage(message)
         }
 
@@ -290,7 +303,7 @@ abstract class NymeriaBaseActivity<T : ViewBinding> : AppCompatActivity() {
      * 隐藏加载条
      */
     @Deprecated(message = "方法暂未实现")
-    fun hiddenProgressBar(showMessageText: String) {
+    fun hideProgressBar() {
         if (isMainThread()) {
             progressBar.visibility = View.GONE
         } else {
