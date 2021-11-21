@@ -29,8 +29,9 @@ class MainActivity : NymeriaBaseActivity<ActivityMainBinding>() {
         _viewBinding.fab.setOnClickListener { view ->
 //            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                .setAction("Action", null).show()
-            requestPermissionX();
-            Log.i(TAG,"牛逼");
+            //requestPermissionX();
+            showProgressDialog("牛逼", "请等待", true, false);
+            Log.i(TAG, "牛逼");
         }
     }
 

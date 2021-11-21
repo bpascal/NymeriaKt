@@ -1,5 +1,7 @@
 package com.codido.nymeria
 
+import android.app.AlertDialog
+import android.app.Dialog
 import android.os.Bundle
 import android.os.Handler
 import android.view.*
@@ -12,7 +14,10 @@ import java.lang.reflect.ParameterizedType
 import android.os.Looper
 import android.os.Message
 import android.util.Log
+import android.widget.ProgressBar
 import android.widget.Toast
+import org.jetbrains.anko.indeterminateProgressDialog
+import org.jetbrains.anko.progressDialog
 
 
 /**
@@ -41,9 +46,49 @@ abstract class NymeriaBaseActivity<T : ViewBinding> : AppCompatActivity() {
     val MESSAGE_WHAT_SHOW_SHORTTOAST = 102;
 
     /**
+     * 显示加载条
+     */
+    val MESSAGE_WHAT_SHOW_PROGRESSBAR = 103;
+
+    /**
+     * 隐藏加载条
+     */
+    val MESSAGE_WHAT_HIDE_PROGRESSBAR = 104;
+
+    /**
+     * 显示加载框
+     */
+    val MESSAGE_WHAT_SHOW_PROGRESSDIALOG = 105;
+
+    /**
+     * 隐藏加载框
+     */
+    val MESSAGE_WHAT_HIDE_PROGRESSDIALOG = 106;
+
+    /**
      * toast显示的字符串的常量
      */
     val MESSAGE_KEY_TOAST_STR = "MESSAGE_KEY_TOAST_STR";
+
+    /**
+     * 加载框显示的字符串常量
+     */
+    val MESSAGE_KEY_PROGRESS_STR = "MESSAGE_KEY_PROGRESS_STR";
+
+    /**
+     * 加载框显示的标题字符串常量
+     */
+    val MESSAGE_KEY_PROGRESS_TITLE = "MESSAGE_KEY_PROGRESS_STR"
+
+    /**
+     * 加载框是否可以手工取消
+     */
+    val MESSAGE_KEY_PROGRESS_CANCELABLE = "MESSAGE_KEY_PROGRESS_CANCELABLE"
+
+    /**
+     * 加载框是否点周围可以取消
+     */
+    val MESSAGE_KEY_PROGRESS_CANCELABLEOUTSIDE = "MESSAGE_KEY_PROGRESS_CANCELABLEOUTSIDE"
 
     /**
      * 两次点击返回按钮时间在2秒之内，则退出APP
@@ -66,6 +111,16 @@ abstract class NymeriaBaseActivity<T : ViewBinding> : AppCompatActivity() {
     abstract var isDoubleBackExit: Boolean;
 
     /**
+     * 加载进度条
+     */
+    lateinit var progressBar: ProgressBar
+
+    /**
+     * 加载进度框
+     */
+    lateinit var progressDialog: Dialog
+
+    /**
      * 通用处理handler
      */
     private val mHandler: Handler = object : Handler(Looper.getMainLooper()) {
@@ -73,12 +128,14 @@ abstract class NymeriaBaseActivity<T : ViewBinding> : AppCompatActivity() {
             super.handleMessage(msg)
             when (msg.what) {
                 MESSAGE_WHAT_SHOW_LONGTOAST -> {
+                    //显示长时间toast
                     val msgObj = msg.data
                     var showStr = msgObj.getString(MESSAGE_KEY_TOAST_STR)
                     Toast.makeText(this@NymeriaBaseActivity, showStr.toString(), Toast.LENGTH_LONG)
                         .show();
                 }
                 MESSAGE_WHAT_SHOW_SHORTTOAST -> {
+                    //显示短时间toast
                     val msgObj = msg.data
                     var showStr = msgObj.getString(MESSAGE_KEY_TOAST_STR)
                     Toast.makeText(
@@ -86,6 +143,28 @@ abstract class NymeriaBaseActivity<T : ViewBinding> : AppCompatActivity() {
                         showStr.toString(),
                         Toast.LENGTH_SHORT
                     ).show();
+                }
+                MESSAGE_WHAT_SHOW_PROGRESSBAR -> {
+                    //TODO bpascal 实现 显示加载条
+                }
+                MESSAGE_WHAT_HIDE_PROGRESSBAR -> {
+                    //TODO bpascal 实现 隐藏加载条
+                }
+                MESSAGE_WHAT_SHOW_PROGRESSDIALOG -> {
+                    //显示加载对话框
+                    val msgObj = msg.data
+                    var showStr = msgObj.getString(MESSAGE_KEY_PROGRESS_STR)
+                    var showTitle = msgObj.getString(MESSAGE_KEY_PROGRESS_TITLE)
+                    var cancelAble = msgObj.getBoolean(MESSAGE_KEY_PROGRESS_CANCELABLE)
+                    var cancelOutSide = msgObj.getBoolean(MESSAGE_KEY_PROGRESS_CANCELABLEOUTSIDE)
+                    progressDialog = indeterminateProgressDialog(showStr, showTitle)
+                    progressDialog.setCancelable(cancelAble)
+                    progressDialog.setCanceledOnTouchOutside(cancelOutSide)
+                    progressDialog.show()
+                }
+                MESSAGE_WHAT_HIDE_PROGRESSDIALOG -> {
+                    //隐藏加载对话框
+                    progressDialog.hide()
                 }
                 else -> {
                     val mBundle = msg.data
@@ -115,6 +194,8 @@ abstract class NymeriaBaseActivity<T : ViewBinding> : AppCompatActivity() {
      * 初始化页面元素方法
      */
     open fun initViews() {
+        progressBar = ProgressBar(this, null, 0, R.style.Widget_AppCompat_ProgressBar_Horizontal)
+        progressBar.max = 100;
         val type = javaClass.genericSuperclass as ParameterizedType
         val cls = type.actualTypeArguments[0] as Class<*>
         try {
@@ -183,6 +264,79 @@ abstract class NymeriaBaseActivity<T : ViewBinding> : AppCompatActivity() {
             val message: Message = Message();
             message.what = MESSAGE_WHAT_SHOW_SHORTTOAST;
             message.data.putString(MESSAGE_KEY_TOAST_STR, toastTxt);
+            mHandler.sendMessage(message)
+        }
+    }
+
+    /**
+     * 显示加载条
+     */
+    @Deprecated(message = "方法暂未实现")
+    fun showProgressBar(showMessageText: String) {
+        //TODO bpascal 方法实现
+        if (isMainThread()) {
+            progressBar.visibility = View.VISIBLE
+        } else {
+            //当前不在主线程，
+            val message = Message();
+            message.what = MESSAGE_WHAT_SHOW_PROGRESSBAR;
+            message.data.putString(MESSAGE_KEY_PROGRESS_STR, showMessageText)
+            mHandler.sendMessage(message)
+        }
+
+    }
+
+    /**
+     * 隐藏加载条
+     */
+    @Deprecated(message = "方法暂未实现")
+    fun hiddenProgressBar(showMessageText: String) {
+        if (isMainThread()) {
+            progressBar.visibility = View.GONE
+        } else {
+            //当前不在主线程，
+            val message = Message();
+            message.what = MESSAGE_WHAT_HIDE_PROGRESSBAR;
+            mHandler.sendMessage(message)
+        }
+    }
+
+    /**
+     * 显示默认的加载对话框
+     */
+    fun showProgressDialog(
+        showMessageText: String,
+        showMessageTitle: String,
+        cancelAble: Boolean,
+        cancelOutSide: Boolean
+    ) {
+        if (isMainThread()) {
+            progressDialog = indeterminateProgressDialog(showMessageText, showMessageTitle)
+            progressDialog.setCancelable(cancelAble)
+            progressDialog.setCanceledOnTouchOutside(cancelOutSide)
+            progressDialog.show()
+        } else {
+            //当前不在主线程，
+            val message = Message();
+            message.what = MESSAGE_WHAT_SHOW_PROGRESSDIALOG;
+            message.data.putString(MESSAGE_KEY_PROGRESS_STR, showMessageText)
+            message.data.putString(MESSAGE_KEY_PROGRESS_TITLE, showMessageTitle)
+            message.data.putBoolean(MESSAGE_KEY_PROGRESS_STR, cancelAble)
+            message.data.putBoolean(MESSAGE_KEY_PROGRESS_TITLE, cancelOutSide)
+            mHandler.sendMessage(message)
+        }
+    }
+
+    /**
+     * 隐藏默认的加载对话框
+     */
+    fun hideProgressDialog() {
+        if (isMainThread()) {
+            progressDialog.hide()
+        } else {
+            //当前不在主线程，
+            val message = Message();
+            message.what = MESSAGE_WHAT_HIDE_PROGRESSDIALOG;
             mHandler.sendMessage(message)
         }
     }
