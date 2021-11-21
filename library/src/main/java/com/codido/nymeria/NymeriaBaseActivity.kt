@@ -304,6 +304,7 @@ abstract class NymeriaBaseActivity<T : ViewBinding> : AppCompatActivity() {
      */
     @Deprecated(message = "方法暂未实现")
     fun hideProgressBar() {
+        //TODO bpascal 方法实现
         if (isMainThread()) {
             progressBar.visibility = View.GONE
         } else {
